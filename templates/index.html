@@ -1,0 +1,251 @@
+<html>
+  <head>
+    <title>人流偵測系統</title>
+
+    <!-- <meta http-equiv = "refresh" content = "1;url={{ url_for('count') }}" >   -->
+    
+    <style>
+
+        body {  
+            padding-top: 5px;  
+        }  
+        #main {  
+            margin: auto;  
+            text-align: center;  
+            width: 500px;  
+            height: 200px;
+            font-size: 20px; 
+        }  
+        #show_time0{  
+        width:500px;
+        height:0px;
+        color: #FFF; 
+        padding-left: 40%;    
+        }  
+        .wrap0{ /*父元素*/
+            text-align: center;
+            width: 100%;
+            height: 200px;
+            display: flex;
+            justify-content: space-between;
+            
+        }
+
+        .wrap{ /*父元素*/
+            width: 100%;
+            height: 300px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .wrap2{ /*父元素*/
+            width: 100%;
+            height: 300px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .center{
+            width: 100%;
+            height: 300px;
+            line-height: 250px;
+        }
+        .lefttop{
+            
+            width: 50%;
+            /* height: px; */
+            /* line-height: 180px; */
+            font-size: 80px;
+            color: #FFF;
+        }
+        .righttop{
+            
+            width: 50%;
+            /* height: px; */
+            /* line-height: 180px; */
+            font-size: 80px;
+            color: #FFF;
+        }
+        .left{
+            background: LawnGreen;
+            width: 40%;
+            height: 380px;
+            line-height: 0px;
+            border-width:5px;
+            border-style:solid; 
+            border-radius:10px;
+            margin-left:5%;
+        }
+        .right{
+            background: red;
+            width: 40%;
+            height: 380px;
+            line-height: 0px;
+            border-width:5px;
+            border-style:solid; 
+            border-radius:10px;
+            margin-right:5%;
+        }
+        </style> 
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+    <script type="text/javascript" charset="utf-8">
+        // $(document).ready(function(){
+        windw_socket=null
+        function ws(){
+        var websocket_url = location.protocol+'//' + document.domain + ':' + location.port;
+        var socket = io.connect(websocket_url);
+        var start = 0
+        let count_text = document.getElementById('div2')
+        let wel_text = document.getElementById('wel')
+        let sheet = document.querySelector('.left')
+        const audio1 = document.getElementById("audio-element");
+        const audio2 = document.getElementById("audio-element2");
+        const audio3 = document.getElementById("audio-element3");
+        
+        socket.on('count', function(data) {
+            // console.log('my_response_message:'+data);
+            // alert("收到服务端的回复:" + wel_text.innerHTML)
+            // document.getElementById("count").innerHTML = document.getElementById("count").innerHTML.replace(start, data.data);
+            if (data.data <= 6)
+            {   
+                sheet.style.background = 'LawnGreen'
+                count_text.innerHTML = '<p style="color:#31333C; text-align:center; font-size: 200px; font-weight:bold; font-family:OCR A Std, monospace ">' + data.data + '</p>' 
+                wel_text.innerHTML = '<p style="color:LawnGreen; text-align:center; font-size: 150px; font-weight:bold;">歡迎光臨~</p>'
+                audio1.play();   
+            }
+            else if (data.data > 6 && data.data < 10)
+            {
+                sheet.style.background = 'yellow'
+                count_text.innerHTML = '<p style="color:#31333C; text-align:center; font-size: 200px; font-weight:bold; font-family:OCR A Std, monospace">' + data.data + '</p>'
+                wel_text.innerHTML = '<p style="color:yellow; text-align:center; font-size: 150px; font-weight:bold;">即將達到上限...</p>'
+                audio2.play();
+            }
+            else
+            {
+                sheet.style.background = 'red'
+                count_text.innerHTML = '<p style="color:white; text-align:center; font-size: 200px; font-weight:bold; font-family:OCR A Std, monospace">' + data.data + '</p>'
+                wel_text.innerHTML = '<p style="color:red; text-align:center; font-size: 150px; font-weight:bold;">請勿再進入!!!</p>'
+                audio3.play();
+            }
+            
+            start = data.data
+        
+            windw_socket=socket
+            // document.getElementById("count").innerHTML.replace(data.data);
+            // $('#count').append('<p>status: ' + data.data + '</p>');
+        });
+    }
+    // window.onbeforeunload= function(event) {
+    // if (windw_socket!=null && !windw_socket.closed){
+    //     // confirm(windw_socket.closed)
+    //     windw_socket.close()
+    // }
+    // }
+    // window.onunload= function(event) {
+    // if (windw_socket!=null && !windw_socket.closed){
+    //     //confirm(windw_socket.closed)
+    //     windw_socket.close()
+    // }
+    // }
+        // });
+        
+    </script>
+  </head>
+
+  <marquee style = "background:black; color:red; font-size:30px; font-weight:bold;">
+    入內請戴口罩、量體溫、噴酒精消毒，感謝配合。
+   </marquee>
+
+  <body style="background: #31333C", onload="ws()">
+
+    <audio id="audio-element" >
+        <source src="{{ url_for('static', filename='welcome.mp3') }}" type="audio/mpeg">
+    </audio>
+    
+    <audio id="audio-element2" >
+        <source src="{{ url_for('static', filename='notice.mp3') }}" type="audio/mpeg">
+    </audio>
+
+    <audio id="audio-element3" >
+        <source src="{{ url_for('static', filename='stop.mp3') }}" type="audio/mpeg">
+    </audio>
+
+    <h1>
+        
+        <div id="show_time0">
+        <script>
+         setInterval("show_time0.innerHTML=new Date().toLocaleString()+' 星期'+'日一二三四五六'.charAt(new Date().getDay());");  
+        </script>
+
+        </script>
+        
+        
+        
+    </div>
+    </h1>
+    <div class="wrap0">
+        <div class="lefttop", style="font-size: 80px;">
+            <p>目前場內人數: </p> 
+        </div>
+        <div class="righttop", style="font-size: 80px;">
+            <p>最大上限人數: </p> 
+        </div>
+    </div>
+    <div class="wrap", id="div1">
+        
+        <div class="left", id="div2">
+            <p style="color:#31333C; text-align:center; font-size: 180px; font-weight:bold; font-family:OCR A Std, monospace">0</p>
+        </div>
+
+        <div class="right"><p style="color:white; text-align:center; font-size: 180px; font-weight:bold; font-family:OCR A Std, monospace ">{{'10'}}</p></div>
+    </div>
+
+    <div class="wrap2">
+        <div class="center", id="wel">
+
+            <p style="color:LawnGreen; text-align:center; font-size: 120px; font-weight:bold;">歡迎光臨~</p>
+    
+        </div>
+    </div>
+
+
+    
+    <!-- <div id="count1"></div> -->
+    
+    
+    <!-- <div class="wrap">
+        
+        {% if demo_int >= 10 %}
+        <div class="left" style="background: red;">
+            <p style="color:white; text-align:center; font-size: 60px; font-weight:bold; font-family:OCR A Std, monospace">已達上限人數</p>
+        </div>
+        {% elif demo_int > 6 %}
+        <div class="left" style="background: yellow;">
+            <p style="color:#31333C; text-align:center; font-size: 60px; font-weight:bold; font-family:OCR A Std, monospace">目前場內人數: {{demo_int}}</p>
+        </div>
+        {% elif demo_int <= 6 %}
+        <div class="left">
+            <p style="color:#31333C; text-align:center; font-size: 60px; font-weight:bold; font-family:OCR A Std, monospace">目前場內人數: {{demo_int}}</p>
+        </div>
+        {% endif %}
+        <div class="right"><p style="color:white; text-align:center; font-size: 60px; font-weight:bold; font-family:OCR A Std, monospace ">最大上限人數: {{'10'}}</p></div>
+    </div> -->
+
+    <!-- <div class="wrap2">
+        <div class="center">
+
+        {% if demo_int >= 10 %}
+            <p style="color:red; text-align:center; font-size: 150px; font-weight:bold;">請勿再進入!!!</p>
+        {% elif demo_int <= 6 %}
+        <p style="color:LawnGreen; text-align:center; font-size: 150px; font-weight:bold;">歡迎光臨~</p>
+        {% elif demo_int > 6 %}
+        <p style="color:yellow; text-align:center; font-size: 150px; font-weight:bold;">即將達到上限...</p>
+        {% endif %}
+    </div>
+    </div -->
+        
+
+
+  </body>
+</html>
